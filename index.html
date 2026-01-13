@@ -3,35 +3,32 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>VCF Quiz</title>
+  <title>VCF 2V0-13.25 Quiz</title>
   <style>
     :root{
-      --bg:#07101f; --panel:#0b1730; --card:#0f1f3f;
-      --text:#eaf0ff; --muted:#9bb0d0; --line:rgba(255,255,255,.12);
-      --ok:#22c55e; --bad:#ef4444; --warn:#f59e0b;
-      --btn:#142a55;
+      --bg:#07101f; --card:#0f1f3f; --text:#eaf0ff; --muted:#9bb0d0; --line:rgba(255,255,255,.12);
+      --ok:#22c55e; --bad:#ef4444; --warn:#f59e0b; --btn:#142a55;
     }
     *{box-sizing:border-box}
     body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;background:linear-gradient(180deg,#050b16, #07101f 30%, #07101f);color:var(--text)}
     header{position:sticky;top:0;z-index:10;background:rgba(7,16,31,.9);backdrop-filter: blur(10px);border-bottom:1px solid var(--line)}
-    .wrap{max-width:920px;margin:0 auto;padding:14px}
+    .wrap{max-width:980px;margin:0 auto;padding:14px}
     .toprow{display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between}
     .pills{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
     .pill{padding:6px 10px;border:1px solid var(--line);background:rgba(255,255,255,.04);border-radius:999px;color:var(--text);font-size:13px}
-    .pill strong{color:#fff}
     .btnrow{display:flex;gap:8px;flex-wrap:wrap}
     button{
       background:var(--btn);color:var(--text);border:1px solid var(--line);
       padding:10px 14px;border-radius:12px;font-size:14px;cursor:pointer
     }
     button:disabled{opacity:.45;cursor:not-allowed}
-    main{max-width:920px;margin:0 auto;padding:16px 14px 70px}
+    main{max-width:980px;margin:0 auto;padding:16px 14px 80px}
     .card{
       background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.02));
       border:1px solid var(--line);border-radius:18px;padding:18px
     }
     .qhead{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;margin-bottom:12px}
-    .qtitle{font-size:18px;font-weight:800;margin:0}
+    .qtitle{font-size:18px;font-weight:800;margin:0;line-height:1.55}
     .qmeta{color:var(--muted);font-size:13px}
     .opts{display:flex;flex-direction:column;gap:10px;margin:14px 0 10px}
     .opt{
@@ -39,7 +36,7 @@
       padding:12px 12px;border-radius:14px;display:flex;gap:10px;align-items:center
     }
     .opt input{width:20px;height:20px}
-    .opt span{line-height:1.5}
+    .opt span{line-height:1.55}
     .feedback{
       margin-top:12px;border-radius:14px;padding:12px;border:1px solid var(--line);
       background:rgba(255,255,255,.03);display:none
@@ -64,7 +61,7 @@
   <div class="wrap">
     <div class="toprow">
       <div class="pills">
-        <div class="pill"><strong id="modePill">-</strong></div>
+        <div class="pill">نوع: <strong id="modePill">-</strong></div>
         <div class="pill">السؤال: <strong id="posPill">0/0</strong></div>
         <div class="pill">صح: <strong id="okPill">0</strong></div>
         <div class="pill">خطأ: <strong id="badPill">0</strong></div>
@@ -107,16 +104,15 @@
       <button id="nextBtn">Next</button>
       <button id="finishBtn">Finish</button>
     </div>
-    <div class="qmeta" id="hint">اختَر إجابة ثم اضغط Next. (يسمح بالتقدم حتى لو خطأ)</div>
+    <div class="qmeta" id="hint">Next يمشي حتى لو خطأ + ترتيب الأسئلة/الخيارات عشوائي.</div>
   </div>
 </div>
 
 <script>
-  // ====== إعدادات ======
   const QUESTIONS_URL = "./questions.json";
-  const SHUFFLE_ON_LOAD = true;
+  const SHUFFLE_QUESTIONS_ON_LOAD = true;
+  const SHUFFLE_CHOICES_ON_RENDER = true;
 
-  // ====== عناصر ======
   const modePill = document.getElementById("modePill");
   const posPill  = document.getElementById("posPill");
   const okPill   = document.getElementById("okPill");
@@ -137,14 +133,16 @@
   const shuffleBtn = document.getElementById("shuffleBtn");
   const resetBtn = document.getElementById("resetBtn");
 
-  // ====== حالة ======
   let allQuestions = [];
-  let order = [];            // ترتيب الأسئلة (أرقام)
-  let i = 0;                 // مؤشر السؤال الحالي داخل order
+  let order = [];
+  let i = 0;
   let stats = { ok:0, bad:0 };
-  let answered = [];         // لتتبع إذا تم احتساب السؤال حتى لا ينحسب مرتين
+  let answered = [];
 
-  // ====== أدوات ======
+  // نخزن شفل الخيارات لكل سؤال (حسب id)
+  // choiceState[qIndex] = { choices:[], mapNewToOld:[], mapOldToNew:[] }
+  let choiceState = {};
+
   function shuffleArray(arr){
     for(let k=arr.length-1; k>0; k--){
       const r = Math.floor(Math.random()*(k+1));
@@ -154,18 +152,17 @@
   }
 
   function normalizeType(t){
-    // يقبل: single / multiple / Choose one / Choose multiple / Choose one (…)
     if(!t) return "single";
     const s = String(t).toLowerCase();
     if(s.includes("multiple")) return "multiple";
     if(s.includes("single")) return "single";
     if(s.includes("choose one")) return "single";
     if(s.includes("choose multiple")) return "multiple";
-    return s.trim();
+    return s.trim() || "single";
   }
 
   function toArrayAnswer(ans){
-    // يقبل: رقم / [أرقام] / "A" … الخ (لكن الأفضل أرقام)
+    if(ans === null || ans === undefined) return null; // يعني ما فيه Answer Key
     if(Array.isArray(ans)) return ans.map(Number);
     if(ans === 0 || ans) return [Number(ans)];
     return [];
@@ -174,11 +171,27 @@
   function getCurrent(){
     const q = allQuestions[ order[i] ];
     const type = normalizeType(q.type);
-    const choices = q.choices || [];
     const answer = toArrayAnswer(q.answer);
     const explain = q.explain || "";
     const text = q.q || q.question || q.text || "";
-    return { q, type, choices, answer, explain, text };
+    const originalChoices = Array.isArray(q.choices) ? q.choices : [];
+
+    // جهّز شفل الخيارات لهذا السؤال (مرة وحدة لكل سؤال في الجلسة)
+    const qKey = order[i];
+    if(!choiceState[qKey]){
+      const idxs = originalChoices.map((_,ix)=>ix);
+      if(SHUFFLE_CHOICES_ON_RENDER) shuffleArray(idxs);
+
+      const newChoices = idxs.map(ix => originalChoices[ix]);
+      const mapNewToOld = idxs.slice();
+      const mapOldToNew = [];
+      mapNewToOld.forEach((oldIx, newIx)=>{ mapOldToNew[oldIx]=newIx; });
+
+      choiceState[qKey] = { choices:newChoices, mapNewToOld, mapOldToNew, originalChoices };
+    }
+
+    const st = choiceState[qKey];
+    return { q, type, choices: st.choices, answer, explain, text, mapNewToOld: st.mapNewToOld, mapOldToNew: st.mapOldToNew, originalChoices: st.originalChoices };
   }
 
   function setFeedback(kind, title, bodyHtml){
@@ -189,18 +202,15 @@
     feedbackEl.style.display = "block";
   }
 
-  function hideFeedback(){
-    feedbackEl.style.display = "none";
-  }
+  function hideFeedback(){ feedbackEl.style.display = "none"; }
 
-  function getSelectedIndices(type){
+  function getSelectedNewIndices(type){
     const inputs = [...optionsEl.querySelectorAll("input[name='opt']")];
     if(type === "single"){
       const idx = inputs.findIndex(x => x.checked);
       return idx >= 0 ? [idx] : [];
     }else{
-      const idxs = inputs.map((x,idx)=> x.checked ? idx : -1).filter(x=>x>=0);
-      return idxs;
+      return inputs.map((x,idx)=> x.checked ? idx : -1).filter(x=>x>=0);
     }
   }
 
@@ -211,18 +221,15 @@
     return A.every((v,ix)=> v===B[ix]);
   }
 
-  function correctText(choices, answerIdxs){
-    return answerIdxs.map(ix => choices[ix]).filter(Boolean).join(" | ");
+  function correctTextFromOldIndices(originalChoices, answerOldIdxs){
+    return answerOldIdxs.map(ix => originalChoices[ix]).filter(Boolean).join(" | ");
   }
 
-  // ====== رسم السؤال ======
   function render(){
     if(!allQuestions.length){
       qTextEl.textContent = "لا يوجد أسئلة. تأكد أن questions.json موجود وصحيح.";
       optionsEl.innerHTML = "";
-      prevBtn.disabled = true;
-      nextBtn.disabled = true;
-      finishBtn.disabled = true;
+      prevBtn.disabled = true; nextBtn.disabled = true; finishBtn.disabled = true;
       return;
     }
 
@@ -237,7 +244,6 @@
     qIndexEl.textContent = `Question ${i+1}`;
     qTextEl.textContent = text || `Question ${i+1}`;
 
-    // خيارات
     optionsEl.innerHTML = "";
     const inputType = (type === "single") ? "radio" : "checkbox";
 
@@ -252,24 +258,33 @@
     });
 
     hideFeedback();
-
     prevBtn.disabled = (i === 0);
     nextBtn.disabled = (i === order.length - 1);
   }
 
-  // ====== تحكم ======
   nextBtn.addEventListener("click", () => {
-    const { type, choices, answer, explain } = getCurrent();
-    const selected = getSelectedIndices(type);
+    const { type, answer, explain, mapNewToOld, mapOldToNew, originalChoices } = getCurrent();
+    const selectedNew = getSelectedNewIndices(type);
 
-    if(selected.length === 0){
+    if(selectedNew.length === 0){
       setFeedback("warn","تنبيه","اختر إجابة أولاً ثم اضغط Next.");
       return;
     }
 
-    const ok = sameSet(selected, answer);
+    // حوّل اختيار المستخدم (new) إلى أرقام الأصل (old) عشان نقارن بالـ answer اللي نفترضه old
+    const selectedOld = selectedNew.map(n => mapNewToOld[n]);
 
-    // احتساب مرة واحدة فقط لكل سؤال
+    // لو ما فيه Answer Key أصلاً
+    if(answer === null){
+      setFeedback("warn","✅ تم تسجيل إجابتك",
+        `ما عندي Answer Key في questions.json عشان أحدد صح/خطأ.<br>${explain ? `<div style="margin-top:8px;color:var(--muted)">${explain}</div>` : ""}`
+      );
+      if(i < order.length - 1){ i++; setTimeout(render, 200); }
+      return;
+    }
+
+    const ok = sameSet(selectedOld, answer);
+
     if(!answered[order[i]]){
       answered[order[i]] = true;
       if(ok) stats.ok++; else stats.bad++;
@@ -277,7 +292,7 @@
       badPill.textContent = stats.bad;
     }
 
-    const correctAnsText = correctText(choices, answer) || "(غير محدد)";
+    const correctAnsText = correctTextFromOldIndices(originalChoices, answer) || "(غير محدد)";
     const explainHtml = explain ? `<div style="margin-top:8px;color:var(--muted)">${explain}</div>` : "";
 
     if(ok){
@@ -286,16 +301,14 @@
       setFeedback("bad","❌ خطأ",`الصحيح: <strong>${correctAnsText}</strong>${explainHtml}`);
     }
 
-    // >>> هذا أهم سطر: يكمل للسؤال اللي بعده حتى لو غلط
+    // يمشي حتى لو خطأ
     if(i < order.length - 1){
       i++;
-      setTimeout(render, 250); // مهلة بسيطة عشان تشوف صح/خطأ
+      setTimeout(render, 250);
     }
   });
 
-  prevBtn.addEventListener("click", () => {
-    if(i>0){ i--; render(); }
-  });
+  prevBtn.addEventListener("click", () => { if(i>0){ i--; render(); } });
 
   finishBtn.addEventListener("click", () => {
     setFeedback("ok","النتيجة",
@@ -308,6 +321,7 @@
     i = 0;
     stats = { ok:0, bad:0 };
     answered = [];
+    choiceState = {}; // عشان يعيد شفل الخيارات
     render();
   });
 
@@ -318,37 +332,27 @@
     render();
   });
 
-  // ====== تحميل الأسئلة ======
   async function load(){
     try{
       const res = await fetch(QUESTIONS_URL, { cache: "no-store" });
       if(!res.ok) throw new Error("HTTP " + res.status);
       const data = await res.json();
-
       if(!Array.isArray(data)) throw new Error("questions.json لازم يكون Array []");
 
-      allQuestions = data.map(q => ({
-        type: q.type,
-        q: q.q,
-        choices: q.choices,
-        answer: q.answer,
-        explain: q.explain
-      }));
-
+      allQuestions = data;
       order = allQuestions.map((_,idx)=>idx);
-      if(SHUFFLE_ON_LOAD) shuffleArray(order);
+      if(SHUFFLE_QUESTIONS_ON_LOAD) shuffleArray(order);
 
       i = 0;
       stats = { ok:0, bad:0 };
       answered = [];
+      choiceState = {};
       render();
     }catch(e){
       qTextEl.textContent = "ما قدرت أقرأ questions.json. تأكد إنه موجود وصحيح.";
       optionsEl.innerHTML = "";
       setFeedback("bad","خطأ تحميل", String(e));
-      prevBtn.disabled = true;
-      nextBtn.disabled = true;
-      finishBtn.disabled = true;
+      prevBtn.disabled = true; nextBtn.disabled = true; finishBtn.disabled = true;
     }
   }
 
