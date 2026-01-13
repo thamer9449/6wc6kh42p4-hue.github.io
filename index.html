@@ -1,242 +1,154 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>VCF 2V0-13.25 – Quiz (Full v2)</title>
-<style>
-body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;margin:0;background:#0b0d10;color:#e9eef5}
-header{position:sticky;top:0;background:#0b0d10;border-bottom:1px solid #1c2430;padding:10px 12px;z-index:10}
-.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-.pill{padding:6px 10px;border:1px solid #233043;border-radius:999px;font-size:13px;color:#cfe3ff}
-.btn{background:#1a2636;color:#e9eef5;border:1px solid #2a3a52;padding:8px 12px;border-radius:10px;font-size:14px}
-main{padding:14px;max-width:900px;margin:0 auto}
-.card{background:#0f141b;border:1px solid #1c2430;border-radius:14px;padding:14px}
-.qhead{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
-.qnum{font-weight:800}
-.muted{color:#a9b7c8;font-size:13px}
-.stem{margin:10px 0 12px;line-height:1.55;white-space:pre-wrap}
-.opts{display:flex;flex-direction:column;gap:8px}
-label.opt{display:flex;gap:10px;align-items:flex-start;padding:10px;border:1px solid #1c2430;border-radius:12px;background:#0b0f15}
-.feedback{margin-top:12px;padding:10px;border-radius:12px;border:1px solid #1c2430;background:#0b0f15;line-height:1.6;white-space:pre-wrap}
-.feedback.good{border-color:#245c39}
-.feedback.bad{border-color:#7a2b2b}
-.feedback.neutral{border-color:#2a3a52}
-.nav{display:flex;justify-content:space-between;gap:10px;margin-top:12px}
-.sectionbar{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
-.sectionbar .btn.active{border-color:#4f86ff}
-.modalback{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;padding:18px}
-.modal{background:#0f141b;border:1px solid #1c2430;border-radius:14px;max-width:720px;width:100%;padding:14px}
-.modal pre{white-space:pre-wrap;margin:0;line-height:1.6}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>VCF 2V0-13.25 – Quiz (Full)</title>
+  <style>
+    :root{
+      --bg:#0b1220; --card:#0f1a2e; --accent:#4f8cff; --ok:#21c07a; --bad:#ff5b5b; --muted:#8aa0c6;
+    }
+    *{box-sizing:border-box;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial}
+    body{margin:0;background:linear-gradient(180deg,#060a16,#0b1220);color:#e9eefc}
+    .wrap{max-width:900px;margin:0 auto;padding:16px}
+    .top{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+    .pill{background:#0c1630;border:1px solid #162a55;border-radius:999px;padding:6px 10px}
+    .btn{background:#14265a;border:1px solid #203a7a;color:#e9eefc;border-radius:10px;padding:10px 14px;cursor:pointer}
+    .btn.primary{background:linear-gradient(180deg,#2f63ff,#234edb)}
+    .btn.ghost{background:transparent}
+    .btn:disabled{opacity:.5;cursor:not-allowed}
+    .card{background:linear-gradient(180deg,#0f1a2e,#0b1730);border:1px solid #162a55;border-radius:16px;padding:16px;margin-top:12px}
+    .qhead{display:flex;justify-content:space-between;gap:8px;align-items:center}
+    .qtitle{font-size:18px;font-weight:700}
+    .info{color:var(--muted);font-size:13px}
+    .opt{display:flex;gap:10px;align-items:flex-start;background:#0b1630;border:1px solid #162a55;border-radius:12px;padding:12px;margin:8px 0;cursor:pointer}
+    .opt input{margin-top:3px}
+    .opt.correct{border-color:#1b6; background:#0f2a1f}
+    .opt.wrong{border-color:#a33; background:#2a1212}
+    .footer{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
+    .explain{display:none;margin-top:8px;color:#cfe1ff}
+    .explain.show{display:block}
+    .center{display:flex;justify-content:center;gap:8px;flex-wrap:wrap}
+    .tag{background:#0b1630;border:1px solid #162a55;border-radius:8px;padding:6px 10px}
+  </style>
 </head>
 <body>
-<header>
-  <div class="row">
+<div class="wrap">
+  <div class="top">
     <div class="pill">VCF 2V0-13.25</div>
-    <div class="pill">الوقت: <span id="timer">00:00:00</span></div>
-    <div class="pill">السؤال: <span id="progress">0/60</span></div>
-    <button class="btn" id="finishBtn">Finish</button>
-    <button class="btn" id="retryWrongBtn">Retry Wrong</button>
+    <div class="pill">السؤال: <span id="idx">1</span>/<span id="total">0</span></div>
+    <div class="pill">الوقت: <span id="time">00:00</span></div>
+    <button class="btn ghost" id="retryWrong">Retry Wrong</button>
+    <button class="btn ghost" id="finish">Finish</button>
   </div>
-  <div class="sectionbar" id="sectionbar"></div>
-</header>
 
-<main>
-  <div class="card" id="quizCard">
+  <div class="card">
     <div class="qhead">
-      <div>
-        <div class="qnum" id="qnum">Question</div>
-        <div class="muted" id="qmeta"></div>
-      </div>
-      <button class="btn" id="infoBtn">ℹ️ شرح</button>
+      <div class="qtitle" id="qtext">—</div>
+      <button class="btn ghost" id="toggleExplain">شرح ℹ️</button>
     </div>
+    <div class="info" id="qmeta">Choose multiple</div>
 
-    <div class="stem" id="stem"></div>
-    <div class="opts" id="opts"></div>
-    <div class="feedback neutral" id="feedback">اختر إجابة ثم اضغط Next للتصحيح.</div>
+    <div id="options"></div>
 
-    <div class="nav">
-      <button class="btn" id="prevBtn">Prev</button>
-      <button class="btn" id="nextBtn">Next</button>
+    <div class="explain" id="explain"></div>
+
+    <div class="footer">
+      <button class="btn" id="prev">Prev</button>
+      <button class="btn primary" id="next">Next</button>
     </div>
   </div>
 
-  <div class="card" id="summaryCard" style="display:none;">
-    <div id="summaryText" style="line-height:1.8;white-space:pre-wrap;"></div>
-    <div class="nav">
-      <button class="btn" id="backBtn">Back</button>
-      <button class="btn" id="retryWrongBtn2">Retry Wrong</button>
-    </div>
-  </div>
-</main>
-
-<div class="modalback" id="modalBack">
-  <div class="modal">
-    <div class="row" style="justify-content:space-between;">
-      <div class="pill" id="modalTitle">شرح</div>
-      <button class="btn" id="closeModal">Close</button>
-    </div>
-    <div style="height:10px;"></div>
-    <pre id="modalBody"></pre>
+  <div class="center card">
+    <span class="tag">يحسب الوقت فقط – بدون حد</span>
+    <span class="tag">يرجع للأسئلة الغلط</span>
   </div>
 </div>
 
 <script>
-const SECTIONS = [{"name": "1–20", "start": 1, "end": 20}, {"name": "21–40", "start": 21, "end": 40}, {"name": "41–60", "start": 41, "end": 60}];
-const DATA = [{"n": 1, "stem": "Question 1", "options": ["(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)"], "correct": [2, 3], "explain": "🧩 ركّز على كلمة الشرط الأساسية (SLA/RPO/RTO/Isolation/Policy).\n📌 طابقها مباشرة مع الخيار.\n✅ الجواب: 2, 3"}, {"n": 2, "stem": "Question 2", "options": ["(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)"], "correct": [4], "explain": "🧩 ركّز على كلمة الشرط الأساسية (SLA/RPO/RTO/Isolation/Policy).\n📌 طابقها مباشرة مع الخيار.\n✅ الجواب: 4"}, {"n": 3, "stem": "VCP  VCF Architect: 2V013.25 1", "options": ["(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)"], "correct": [1], "explain": "🧩 ركّز على كلمة الشرط الأساسية (SLA/RPO/RTO/Isolation/Policy).\n📌 طابقها مباشرة مع الخيار.\n✅ الجواب: 1"}, {"n": 4, "stem": "Question 4", "options": ["(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)"], "correct": [3, 4, 6], "explain": "🧩 ركّز على كلمة الشرط الأساسية (SLA/RPO/RTO/Isolation/Policy).\n📌 طابقها مباشرة مع الخيار.\n✅ الجواب: 3, 4, 6"}, {"n": 5, "stem": "Question 5", "options": ["(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)"], "correct": [4], "explain": "🧩 ركّز على كلمة الشرط الأساسية (SLA/RPO/RTO/Isolation/Policy).\n📌 طابقها مباشرة مع الخيار.\n✅ الجواب: 4"}, {"n": 6, "stem": "VCP  VCF Architect: 2V013.25 2", "options": ["(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)"], "correct": [4], "explain": "🧩 ركّز على كلمة الشرط الأساسية (SLA/RPO/RTO/Isolation/Policy).\n📌 طابقها مباشرة مع الخيار.\n✅ الجواب: 4"}, {"n": 7, "stem": "Question 7", "options": ["(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)"], "correct": [4], "explain": "🧩 ركّز على كلمة الشرط الأساسية (SLA/RPO/RTO/Isolation/Policy).\n📌 طابقها مباشرة مع الخيار.\n✅ الجواب: 4"}, {"n": 8, "stem": "Question 8", "options": ["(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)"], "correct": [1], "explain": "🧩 ركّز على كلمة الشرط الأساسية (SLA/RPO/RTO/Isolation/Policy).\n📌 طابقها مباشرة مع الخيار.\n✅ الجواب: 1"}, {"n": 9, "stem": "Question 9", "options": ["(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)"], "correct": [1], "explain": "🧩 ركّز على كلمة الشرط الأساسية (SLA/RPO/RTO/Isolation/Policy).\n📌 طابقها مباشرة مع الخيار.\n✅ الجواب: 1"}, {"n": 10, "stem": "VCP  VCF Architect: 2V013.25 3", "options": ["(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)"], "correct": [2], "explain": "🧩 ركّز على كلمة الشرط الأساسية (SLA/RPO/RTO/Isolation/Policy).\n📌 طابقها مباشرة مع الخيار.\n✅ الجواب: 2"}, {"n": 11, "stem": "Question 11", "options": ["(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)"], "correct": [1, 2], "explain": "🧩 ركّز على كلمة الشرط الأساسية (SLA/RPO/RTO/Isolation/Policy).\n📌 طابقها مباشرة مع الخيار.\n✅ الجواب: 1, 2"}, {"n": 12, "stem": "Question 12", "options": ["(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)"], "correct": [2], "explain": "🧩 ركّز على كلمة الشرط الأساسية (SLA/RPO/RTO/Isolation/Policy).\n📌 طابقها مباشرة مع الخيار.\n✅ الجواب: 2"}, {"n": 13, "stem": "VCP  VCF Architect: 2V013.25 4", "options": ["(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)"], "correct": [2], "explain": "🧩 ركّز على كلمة الشرط الأساسية (SLA/RPO/RTO/Isolation/Policy).\n📌 طابقها مباشرة مع الخيار.\n✅ الجواب: 2"}, {"n": 14, "stem": "Question 14", "options": ["(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)"], "correct": [3, 4], "explain": "🧩 ركّز على كلمة الشرط الأساسية (SLA/RPO/RTO/Isolation/Policy).\n📌 طابقها مباشرة مع الخيار.\n✅ الجواب: 3, 4"}, {"n": 15, "stem": "Question 15", "options": ["(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)"], "correct": [4, 5], "explain": "🧩 ركّز على كلمة الشرط الأساسية (SLA/RPO/RTO/Isolation/Policy).\n📌 طابقها مباشرة مع الخيار.\n✅ الجواب: 4, 5"}, {"n": 16, "stem": "VCP  VCF Architect: 2V013.25 5", "options": ["(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)"], "correct": [3], "explain": "🧩 ركّز على كلمة الشرط الأساسية (SLA/RPO/RTO/Isolation/Policy).\n📌 طابقها مباشرة مع الخيار.\n✅ الجواب: 3"}, {"n": 17, "stem": "Question 17", "options": ["(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)"], "correct": [3], "explain": "🧩 ركّز على كلمة الشرط الأساسية (SLA/RPO/RTO/Isolation/Policy).\n📌 طابقها مباشرة مع الخيار.\n✅ الجواب: 3"}, {"n": 18, "stem": "Question 18", "options": ["(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)"], "correct": [1, 5], "explain": "🧩 ركّز على كلمة الشرط الأساسية (SLA/RPO/RTO/Isolation/Policy).\n📌 طابقها مباشرة مع الخيار.\n✅ الجواب: 1, 5"}, {"n": 19, "stem": "VCP  VCF Architect: 2V013.25 6", "options": ["(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)"], "correct": [3, 4], "explain": "🧩 ركّز على كلمة الشرط الأساسية (SLA/RPO/RTO/Isolation/Policy).\n📌 طابقها مباشرة مع الخيار.\n✅ الجواب: 3, 4"}, {"n": 20, "stem": "Question 20", "options": ["(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)"], "correct": [2], "explain": "🧩 ركّز على كلمة الشرط الأساسية (SLA/RPO/RTO/Isolation/Policy).\n📌 طابقها مباشرة مع الخيار.\n✅ الجواب: 2"}, {"n": 21, "stem": "Question 21", "options": ["(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)"], "correct": [3, 4], "explain": "🧩 ركّز على كلمة الشرط الأساسية (SLA/RPO/RTO/Isolation/Policy).\n📌 طابقها مباشرة مع الخيار.\n✅ الجواب: 3, 4"}, {"n": 22, "stem": "VCP  VCF Architect: 2V013.25 7", "options": ["(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)"], "correct": [1, 4], "explain": "🧩 ركّز على كلمة الشرط الأساسية (SLA/RPO/RTO/Isolation/Policy).\n📌 طابقها مباشرة مع الخيار.\n✅ الجواب: 1, 4"}, {"n": 23, "stem": "Question 23", "options": ["(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)"], "correct": [2], "explain": "🧩 ركّز على كلمة الشرط الأساسية (SLA/RPO/RTO/Isolation/Policy).\n📌 طابقها مباشرة مع الخيار.\n✅ الجواب: 2"}, {"n": 24, "stem": "Question 24", "options": ["(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)"], "correct": [4, 5], "explain": "🧩 ركّز على كلمة الشرط الأساسية (SLA/RPO/RTO/Isolation/Policy).\n📌 طابقها مباشرة مع الخيار.\n✅ الجواب: 4, 5"}, {"n": 25, "stem": "VCP  VCF Architect: 2V013.25 8", "options": ["(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)"], "correct": [4], "explain": "🧩 ركّز على كلمة الشرط الأساسية (SLA/RPO/RTO/Isolation/Policy).\n📌 طابقها مباشرة مع الخيار.\n✅ الجواب: 4"}, {"n": 26, "stem": "Question 26", "options": ["(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)"], "correct": [2], "explain": "🧩 ركّز على كلمة الشرط الأساسية (SLA/RPO/RTO/Isolation/Policy).\n📌 طابقها مباشرة مع الخيار.\n✅ الجواب: 2"}, {"n": 27, "stem": "Question 27", "options": ["(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)"], "correct": [2], "explain": "🧩 ركّز على كلمة الشرط الأساسية (SLA/RPO/RTO/Isolation/Policy).\n📌 طابقها مباشرة مع الخيار.\n✅ الجواب: 2"}, {"n": 28, "stem": "VCP  VCF Architect: 2V013.25 9", "options": ["(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)"], "correct": [1], "explain": "🧩 ركّز على كلمة الشرط الأساسية (SLA/RPO/RTO/Isolation/Policy).\n📌 طابقها مباشرة مع الخيار.\n✅ الجواب: 1"}, {"n": 29, "stem": "Question 29", "options": ["(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)"], "correct": [1, 4], "explain": "🧩 ركّز على كلمة الشرط الأساسية (SLA/RPO/RTO/Isolation/Policy).\n📌 طابقها مباشرة مع الخيار.\n✅ الجواب: 1, 4"}, {"n": 30, "stem": "Question 30", "options": ["(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)"], "correct": [3], "explain": "🧩 ركّز على كلمة الشرط الأساسية (SLA/RPO/RTO/Isolation/Policy).\n📌 طابقها مباشرة مع الخيار.\n✅ الجواب: 3"}, {"n": 31, "stem": "VCP  VCF Architect: 2V013.25 10", "options": ["(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)"], "correct": [2], "explain": "🧩 ركّز على كلمة الشرط الأساسية (SLA/RPO/RTO/Isolation/Policy).\n📌 طابقها مباشرة مع الخيار.\n✅ الجواب: 2"}, {"n": 32, "stem": "Question 32", "options": ["(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)"], "correct": [4], "explain": "🧩 ركّز على كلمة الشرط الأساسية (SLA/RPO/RTO/Isolation/Policy).\n📌 طابقها مباشرة مع الخيار.\n✅ الجواب: 4"}, {"n": 33, "stem": "Question 33", "options": ["(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)"], "correct": [2, 4], "explain": "🧩 ركّز على كلمة الشرط الأساسية (SLA/RPO/RTO/Isolation/Policy).\n📌 طابقها مباشرة مع الخيار.\n✅ الجواب: 2, 4"}, {"n": 34, "stem": "VCP  VCF Architect: 2V013.25 11", "options": ["(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)"], "correct": [2], "explain": "🧩 ركّز على كلمة الشرط الأساسية (SLA/RPO/RTO/Isolation/Policy).\n📌 طابقها مباشرة مع الخيار.\n✅ الجواب: 2"}, {"n": 35, "stem": "Question 35", "options": ["(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)"], "correct": [4], "explain": "🧩 ركّز على كلمة الشرط الأساسية (SLA/RPO/RTO/Isolation/Policy).\n📌 طابقها مباشرة مع الخيار.\n✅ الجواب: 4"}, {"n": 36, "stem": "Question 36", "options": ["(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)"], "correct": [3], "explain": "🧩 ركّز على كلمة الشرط الأساسية (SLA/RPO/RTO/Isolation/Policy).\n📌 طابقها مباشرة مع الخيار.\n✅ الجواب: 3"}, {"n": 37, "stem": "Question 37", "options": ["(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)"], "correct": [1], "explain": "🧩 ركّز على كلمة الشرط الأساسية (SLA/RPO/RTO/Isolation/Policy).\n📌 طابقها مباشرة مع الخيار.\n✅ الجواب: 1"}, {"n": 38, "stem": "VCP  VCF Architect: 2V013.25 12", "options": ["(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)"], "correct": [2], "explain": "🧩 ركّز على كلمة الشرط الأساسية (SLA/RPO/RTO/Isolation/Policy).\n📌 طابقها مباشرة مع الخيار.\n✅ الجواب: 2"}, {"n": 39, "stem": "Question 39", "options": ["(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)"], "correct": [1], "explain": "🧩 ركّز على كلمة الشرط الأساسية (SLA/RPO/RTO/Isolation/Policy).\n📌 طابقها مباشرة مع الخيار.\n✅ الجواب: 1"}, {"n": 40, "stem": "Question 40", "options": ["(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)"], "correct": [2], "explain": "🧩 ركّز على كلمة الشرط الأساسية (SLA/RPO/RTO/Isolation/Policy).\n📌 طابقها مباشرة مع الخيار.\n✅ الجواب: 2"}, {"n": 41, "stem": "VCP  VCF Architect: 2V013.25 13", "options": ["(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)"], "correct": [2, 4, 5], "explain": "🧩 ركّز على كلمة الشرط الأساسية (SLA/RPO/RTO/Isolation/Policy).\n📌 طابقها مباشرة مع الخيار.\n✅ الجواب: 2, 4, 5"}, {"n": 42, "stem": "Question 42", "options": ["(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)"], "correct": [4], "explain": "🧩 ركّز على كلمة الشرط الأساسية (SLA/RPO/RTO/Isolation/Policy).\n📌 طابقها مباشرة مع الخيار.\n✅ الجواب: 4"}, {"n": 43, "stem": "Question 43", "options": ["(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)"], "correct": [4], "explain": "🧩 ركّز على كلمة الشرط الأساسية (SLA/RPO/RTO/Isolation/Policy).\n📌 طابقها مباشرة مع الخيار.\n✅ الجواب: 4"}, {"n": 44, "stem": "VCP  VCF Architect: 2V013.25 14", "options": ["(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)"], "correct": [4], "explain": "🧩 ركّز على كلمة الشرط الأساسية (SLA/RPO/RTO/Isolation/Policy).\n📌 طابقها مباشرة مع الخيار.\n✅ الجواب: 4"}, {"n": 45, "stem": "Question 45", "options": ["(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)"], "correct": [4], "explain": "🧩 ركّز على كلمة الشرط الأساسية (SLA/RPO/RTO/Isolation/Policy).\n📌 طابقها مباشرة مع الخيار.\n✅ الجواب: 4"}, {"n": 46, "stem": "Question 46", "options": ["(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)"], "correct": [1], "explain": "🧩 ركّز على كلمة الشرط الأساسية (SLA/RPO/RTO/Isolation/Policy).\n📌 طابقها مباشرة مع الخيار.\n✅ الجواب: 1"}, {"n": 47, "stem": "Question 47", "options": ["(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)"], "correct": [1], "explain": "🧩 ركّز على كلمة الشرط الأساسية (SLA/RPO/RTO/Isolation/Policy).\n📌 طابقها مباشرة مع الخيار.\n✅ الجواب: 1"}, {"n": 48, "stem": "VCP  VCF Architect: 2V013.25 15", "options": ["(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)"], "correct": [1, 3, 5], "explain": "🧩 ركّز على كلمة الشرط الأساسية (SLA/RPO/RTO/Isolation/Policy).\n📌 طابقها مباشرة مع الخيار.\n✅ الجواب: 1, 3, 5"}, {"n": 49, "stem": "Question 49", "options": ["(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)"], "correct": [1], "explain": "🧩 ركّز على كلمة الشرط الأساسية (SLA/RPO/RTO/Isolation/Policy).\n📌 طابقها مباشرة مع الخيار.\n✅ الجواب: 1"}, {"n": 50, "stem": "Question 50", "options": ["(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)"], "correct": [1], "explain": "🧩 ركّز على كلمة الشرط الأساسية (SLA/RPO/RTO/Isolation/Policy).\n📌 طابقها مباشرة مع الخيار.\n✅ الجواب: 1"}, {"n": 51, "stem": "Question 51", "options": ["(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)"], "correct": [1], "explain": "🧩 ركّز على كلمة الشرط الأساسية (SLA/RPO/RTO/Isolation/Policy).\n📌 طابقها مباشرة مع الخيار.\n✅ الجواب: 1"}, {"n": 52, "stem": "VCP  VCF Architect: 2V013.25 16", "options": ["(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)"], "correct": [1], "explain": "🧩 ركّز على كلمة الشرط الأساسية (SLA/RPO/RTO/Isolation/Policy).\n📌 طابقها مباشرة مع الخيار.\n✅ الجواب: 1"}, {"n": 53, "stem": "Question 53", "options": ["(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)"], "correct": [2], "explain": "🧩 ركّز على كلمة الشرط الأساسية (SLA/RPO/RTO/Isolation/Policy).\n📌 طابقها مباشرة مع الخيار.\n✅ الجواب: 2"}, {"n": 54, "stem": "Question 54", "options": ["(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)"], "correct": [3], "explain": "🧩 ركّز على كلمة الشرط الأساسية (SLA/RPO/RTO/Isolation/Policy).\n📌 طابقها مباشرة مع الخيار.\n✅ الجواب: 3"}, {"n": 55, "stem": "VCP  VCF Architect: 2V013.25 17", "options": ["(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)"], "correct": [4], "explain": "🧩 ركّز على كلمة الشرط الأساسية (SLA/RPO/RTO/Isolation/Policy).\n📌 طابقها مباشرة مع الخيار.\n✅ الجواب: 4"}, {"n": 56, "stem": "Question 56", "options": ["(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)"], "correct": [3], "explain": "🧩 ركّز على كلمة الشرط الأساسية (SLA/RPO/RTO/Isolation/Policy).\n📌 طابقها مباشرة مع الخيار.\n✅ الجواب: 3"}, {"n": 57, "stem": "Question 57", "options": ["(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)"], "correct": [4, 5], "explain": "🧩 ركّز على كلمة الشرط الأساسية (SLA/RPO/RTO/Isolation/Policy).\n📌 طابقها مباشرة مع الخيار.\n✅ الجواب: 4, 5"}, {"n": 58, "stem": "VCP  VCF Architect: 2V013.25 18", "options": ["(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)"], "correct": [2], "explain": "🧩 ركّز على كلمة الشرط الأساسية (SLA/RPO/RTO/Isolation/Policy).\n📌 طابقها مباشرة مع الخيار.\n✅ الجواب: 2"}, {"n": 59, "stem": "Question 59", "options": ["(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)"], "correct": [4], "explain": "🧩 ركّز على كلمة الشرط الأساسية (SLA/RPO/RTO/Isolation/Policy).\n📌 طابقها مباشرة مع الخيار.\n✅ الجواب: 4"}, {"n": 60, "stem": "VCP  VCF Architect: 2V013.25 19", "options": ["(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)", "(خيار غير واضح من الـPDF)"], "correct": [1, 2, 4], "explain": "🧩 ركّز على كلمة الشرط الأساسية (SLA/RPO/RTO/Isolation/Policy).\n📌 طابقها مباشرة مع الخيار.\n✅ الجواب: 1, 2, 4"}];
+/* ==== بنك أسئلة تجريبي (بدّله لاحقًا بالأسئلة الحقيقية) ==== */
+const QUESTIONS = [
+  {
+    text: "Question 1",
+    meta: "Choose multiple",
+    options: [
+      {t:"الخيار A", ok:false},
+      {t:"الخيار B", ok:true},
+      {t:"الخيار C", ok:false},
+      {t:"الخيار D", ok:false},
+    ],
+    explain: "🧩 شرح مختصر للسؤال الأول.\n📌 طريقة التذكّر.\n✅ الجواب: B"
+  },
+  {
+    text: "Question 2",
+    meta: "Choose one",
+    options: [
+      {t:"Option A", ok:true},
+      {t:"Option B", ok:false},
+      {t:"Option C", ok:false},
+    ],
+    explain: "🧩 شرح مختصر.\n📌 تذكّر.\n✅ الجواب: A"
+  }
+];
+/* ============================================================ */
 
-let order = DATA.map(q=>q.n);
-let idx = 0;
-let startTime = Date.now();
-setInterval(()=> {
-  const ms = Date.now()-startTime;
-  const sec = Math.floor(ms/1000);
-  const h = String(Math.floor(sec/3600)).padStart(2,'0');
-  const m = String(Math.floor((sec%3600)/60)).padStart(2,'0');
-  const s = String(sec%60).padStart(2,'0');
-  document.getElementById('timer').textContent = `${h}:${m}:${s}`;
-}, 1000);
+let i=0, wrong=new Set(), start=Date.now(), retryMode=false;
+const $=id=>document.getElementById(id);
 
-const state = {answers: {}, result: {}, wrong: new Set()};
-
-function arraysEqual(a,b){
-  if(a.length!==b.length) return false;
-  const a2=[...a].sort((x,y)=>x-y), b2=[...b].sort((x,y)=>x-y);
-  return a2.every((v,i)=>v===b2[i]);
+function tick(){
+  const s=Math.floor((Date.now()-start)/1000);
+  const m=String(Math.floor(s/60)).padStart(2,'0');
+  const ss=String(s%60).padStart(2,'0');
+  $('time').textContent=`${m}:${ss}`;
 }
-function isMulti(q){ return q.correct && q.correct.length>1; }
-function grade(qn, selected){
-  const q = DATA.find(x=>x.n===qn);
-  return arraysEqual(selected, q.correct);
-}
-
-function buildSections(){
-  const bar=document.getElementById('sectionbar'); bar.innerHTML="";
-  SECTIONS.forEach((s,i)=>{
-    const b=document.createElement('button');
-    b.className='btn'+(i===0?' active':'');
-    b.textContent=s.name;
-    b.onclick=()=>{
-      document.querySelectorAll('.sectionbar .btn').forEach(x=>x.classList.remove('active'));
-      b.classList.add('active');
-      const target = order.findIndex(qn=>qn>=s.start && qn<=s.end);
-      if(target>=0){ idx=target; render(); }
-    };
-    bar.appendChild(b);
-  });
-}
+setInterval(tick,1000);
 
 function render(){
-  const qn = order[idx];
-  const q = DATA.find(x=>x.n===qn);
-  document.getElementById('qnum').textContent = `Question ${q.n}`;
-  document.getElementById('qmeta').textContent = isMulti(q) ? "Choose multiple" : "Choose one";
-  document.getElementById('stem').textContent = q.stem || "";
-  document.getElementById('progress').textContent = `${idx+1}/${order.length}`;
-
-  const optsDiv = document.getElementById('opts'); optsDiv.innerHTML="";
-  const selected = state.answers[qn] || [];
-  const multi = isMulti(q);
-
-  q.options.forEach((opt,i)=>{
-    const n=i+1;
-    const label=document.createElement('label'); label.className='opt';
-    const input=document.createElement('input');
-    input.type = multi ? 'checkbox' : 'radio';
-    input.name='opt';
-    input.checked = selected.includes(n);
-    input.onchange=()=>{
-      let cur = state.answers[qn] ? [...state.answers[qn]] : [];
-      if(multi){
-        if(input.checked){ if(!cur.includes(n)) cur.push(n); }
-        else cur = cur.filter(x=>x!==n);
-      } else {
-        cur=[n];
-      }
-      state.answers[qn]=cur;
+  const q=QUESTIONS[i];
+  $('idx').textContent=i+1; $('total').textContent=QUESTIONS.length;
+  $('qtext').textContent=q.text; $('qmeta').textContent=q.meta;
+  $('options').innerHTML=''; $('explain').classList.remove('show');
+  $('explain').textContent=q.explain||'';
+  q.options.forEach((o,oi)=>{
+    const d=document.createElement('label');
+    d.className='opt';
+    d.innerHTML=`<input type="checkbox"/> <div>${o.t}</div>`;
+    d.onclick=()=>{
+      const chk=d.querySelector('input');
+      chk.checked=!chk.checked;
     };
-    const span=document.createElement('span'); span.textContent=opt;
-    label.appendChild(input); label.appendChild(span);
-    optsDiv.appendChild(label);
+    $('options').appendChild(d);
   });
-
-  const fb=document.getElementById('feedback');
-  const res = state.result[qn];
-  if(res===true){ fb.className='feedback good'; fb.textContent='✅ صحيح'; }
-  else if(res===false){
-    fb.className='feedback bad';
-    fb.textContent = `❌ خطأ\nالجواب الصحيح: ${q.correct.join(",")}`;
-  } else {
-    fb.className='feedback neutral';
-    fb.textContent = 'اختر إجابة ثم اضغط Next للتصحيح.';
-  }
 }
-
-function next(){
-  const qn=order[idx];
-  const selected = state.answers[qn] || [];
-  const res = grade(qn, selected);
-  state.result[qn]=res;
-  if(res===false) state.wrong.add(qn);
-  if(res===true) state.wrong.delete(qn);
-
-  if(idx<order.length-1) idx++;
-  else showSummary();
-  render();
-}
-function prev(){ if(idx>0) idx--; render(); }
-
-function showSummary(){
-  document.getElementById('quizCard').style.display='none';
-  document.getElementById('summaryCard').style.display='block';
-  const total=order.length;
-  const correct = order.filter(qn=> state.result[qn]===true).length;
-  const wrong = order.filter(qn=> state.result[qn]===false).length;
-  const unanswered = order.filter(qn=> state.result[qn]!==true && state.result[qn]!==false).length;
-  const time = document.getElementById('timer').textContent;
-  document.getElementById('summaryText').textContent =
-    `الوقت: ${time}\nالمجموع: ${total}\n✅ صحيح: ${correct}\n❌ خطأ: ${wrong}\n⏺️ بدون تصحيح (لم تضغط Next): ${unanswered}\n\nRetry Wrong يعيد الأسئلة اللي غلطت فيها.`;
-}
-
-function backToQuiz(){
-  document.getElementById('quizCard').style.display='block';
-  document.getElementById('summaryCard').style.display='none';
-  render();
-}
-
-function retryWrong(){
-  const wrongArr = Array.from(state.wrong).sort((a,b)=>a-b);
-  if(wrongArr.length===0){ alert('ما فيه أسئلة غلط.'); return; }
-  order = wrongArr;
-  idx=0;
-  wrongArr.forEach(qn=>{ state.result[qn]=undefined; state.answers[qn]=[]; });
-  document.getElementById('quizCard').style.display='block';
-  document.getElementById('summaryCard').style.display='none';
-  render();
-}
-
-function showInfo(){
-  const qn=order[idx];
-  const q=DATA.find(x=>x.n===qn);
-  document.getElementById('modalTitle').textContent = `شرح Q${qn}`;
-  document.getElementById('modalBody').textContent = q.explain || '';
-  document.getElementById('modalBack').style.display='flex';
-}
-function closeInfo(){ document.getElementById('modalBack').style.display='none'; }
-
-document.getElementById('nextBtn').onclick=next;
-document.getElementById('prevBtn').onclick=prev;
-document.getElementById('finishBtn').onclick=showSummary;
-document.getElementById('backBtn').onclick=backToQuiz;
-document.getElementById('retryWrongBtn').onclick=retryWrong;
-document.getElementById('retryWrongBtn2').onclick=retryWrong;
-document.getElementById('infoBtn').onclick=showInfo;
-document.getElementById('closeModal').onclick=closeInfo;
-document.getElementById('modalBack').onclick=(e)=>{ if(e.target.id==='modalBack') closeInfo(); };
-
-buildSections();
 render();
+
+$('toggleExplain').onclick=()=> $('explain').classList.toggle('show');
+
+$('next').onclick=()=>{
+  const q=QUESTIONS[i];
+  const opts=[...$('options').children];
+  let ok=true;
+  opts.forEach((d,oi)=>{
+    const chosen=d.querySelector('input').checked;
+    if(chosen!==q.options[oi].ok){ ok=false; }
+    d.classList.toggle('correct', q.options[oi].ok);
+    d.classList.toggle('wrong', chosen && !q.options[oi].ok);
+  });
+  if(!ok) wrong.add(i); else wrong.delete(i);
+  setTimeout(()=>{
+    if(i<QUESTIONS.length-1){ i++; render(); }
+  },600);
+};
+
+$('prev').onclick=()=>{ if(i>0){ i--; render(); } };
+
+$('retryWrong').onclick=()=>{
+  if(!wrong.size) return alert('ما فيه أسئلة غلط');
+  QUESTIONS.splice(0, QUESTIONS.length, ...[...wrong].map(x=>QUESTIONS[x]));
+  wrong.clear(); i=0; retryMode=true; render();
+};
+
+$('finish').onclick=()=> alert('انتهى الاختبار');
 </script>
 </body>
 </html>
