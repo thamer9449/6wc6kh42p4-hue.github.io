@@ -1,26 +1,26 @@
 [
   {
-    "type": "Choose one",
-    "q": "اكتب نص السؤال هنا",
+    "type": "single",
+    "q": "ما الهدف الأساسي من VMware Cloud Foundation؟",
     "choices": [
-      "الخيار 1",
-      "الخيار 2",
-      "الخيار 3",
-      "الخيار 4"
+      "إدارة السيرفرات فقط",
+      "توحيد الحوسبة والتخزين والشبكات في منصة واحدة",
+      "تشغيل تطبيقات بدون افتراضية",
+      "إدارة المستخدمين فقط"
     ],
-    "answer": 1,
-    "explain": "سبب مختصر ليه الخيار 2 هو الصحيح"
+    "answer": [1],
+    "explain": "VCF يوفر منصة موحدة تشمل Compute و Storage و Network و Management."
   },
   {
-    "type": "Choose multiple",
-    "q": "سؤال متعدد",
+    "type": "multiple",
+    "q": "أي من التالي تعتبر Workload Domains في VCF؟",
     "choices": [
-      "A",
-      "B",
-      "C",
-      "D"
+      "Management Domain",
+      "Compute Cluster",
+      "VI Workload Domain",
+      "vCenter Appliance"
     ],
     "answer": [0, 2],
-    "explain": "A و C هم الصح"
+    "explain": "Management Domain و VI Workload Domain هما أنواع Workload Domains."
   }
 ]
