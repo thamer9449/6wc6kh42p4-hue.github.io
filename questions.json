@@ -1,326 +1,62 @@
-[
-  {
-    "type": "single",
-    "q": "What is the primary goal of VMware Cloud Foundation (VCF)?",
-    "choices": [
-      "Manage physical servers only",
-      "Provide a unified SDDC platform",
-      "Replace vSphere",
-      "Run workloads without virtualization"
-    ],
-    "answer": [1],
-    "explain": "VCF delivers a full Software-Defined Data Center (SDDC)."
-  },
-  {
-    "type": "multiple",
-    "q": "Which components are core parts of VCF?",
-    "choices": ["vSphere", "vSAN", "NSX", "Horizon"],
-    "answer": [0,1,2],
-    "explain": "VCF core components are vSphere, vSAN, and NSX."
-  },
-  {
-    "type": "single",
-    "q": "Which domain must be deployed first in VCF?",
-    "choices": [
-      "VI Workload Domain",
-      "Management Domain",
-      "Compute Domain",
-      "Edge Domain"
-    ],
-    "answer": [1],
-    "explain": "The Management Domain is mandatory and deployed first."
-  },
-  {
-    "type": "single",
-    "q": "Which tool deploys and manages VCF?",
-    "choices": [
-      "vCenter Server",
-      "SDDC Manager",
-      "NSX Manager",
-      "Lifecycle Manager"
-    ],
-    "answer": [1],
-    "explain": "SDDC Manager handles deployment and lifecycle management."
-  },
-  {
-    "type": "single",
-    "q": "Which storage solution is mandatory in VCF?",
-    "choices": ["NFS", "vSAN", "iSCSI", "Fibre Channel"],
-    "answer": [1],
-    "explain": "vSAN is required for all VCF deployments."
-  },
-  {
-    "type": "single",
-    "q": "Which networking technology is required in VCF?",
-    "choices": ["VLAN only", "NSX", "ACI", "AWS VPC"],
-    "answer": [1],
-    "explain": "NSX provides network virtualization in VCF."
-  },
-  {
-    "type": "multiple",
-    "q": "Which lifecycle tasks does SDDC Manager perform?",
-    "choices": [
-      "Host patching",
-      "Firmware upgrades",
-      "Application deployment",
-      "VCF upgrades"
-    ],
-    "answer": [0,1,3],
-    "explain": "SDDC Manager manages infrastructure lifecycle operations."
-  },
-  {
-    "type": "single",
-    "q": "What protocol is required during VCF bring-up for host discovery?",
-    "choices": ["DNS", "NTP", "DHCP", "IPMI"],
-    "answer": [2],
-    "explain": "DHCP is required during initial bring-up."
-  },
-  {
-    "type": "single",
-    "q": "What is the minimum number of hosts for the Management Domain?",
-    "choices": ["2", "3", "4", "6"],
-    "answer": [1],
-    "explain": "Management Domain requires at least 3 hosts."
-  },
-  {
-    "type": "single",
-    "q": "Which vCenter manages the Management Domain?",
-    "choices": [
-      "External vCenter",
-      "Embedded vCenter",
-      "NSX Manager",
-      "SDDC Manager"
-    ],
-    "answer": [1],
-    "explain": "The Management Domain uses an embedded vCenter."
-  },
-
-  {
-    "type": "multiple",
-    "q": "Which domains are valid Workload Domains in VCF?",
-    "choices": [
-      "Management Domain",
-      "VI Workload Domain",
-      "Compute Cluster",
-      "vCenter Appliance"
-    ],
-    "answer": [0,1],
-    "explain": "VCF supports Management and VI Workload Domains."
-  },
-  {
-    "type": "single",
-    "q": "Which component provides centralized identity in VCF?",
-    "choices": ["NSX", "vSphere", "SDDC Manager", "VMware Identity Manager"],
-    "answer": [3],
-    "explain": "Identity Manager integrates authentication services."
-  },
-  {
-    "type": "single",
-    "q": "Which certificate authority is used in VCF by default?",
-    "choices": ["External CA", "Self-signed", "Microsoft CA", "LetsEncrypt"],
-    "answer": [1],
-    "explain": "VCF uses self-signed certificates by default."
-  },
-  {
-    "type": "single",
-    "q": "What is a VI Workload Domain used for?",
-    "choices": [
-      "Management services",
-      "User workloads",
-      "Networking only",
-      "Backup services"
-    ],
-    "answer": [1],
-    "explain": "VI Workload Domains host customer workloads."
-  },
-  {
-    "type": "single",
-    "q": "Which VCF component manages certificates and passwords?",
-    "choices": ["NSX", "vCenter", "SDDC Manager", "vSAN"],
-    "answer": [2],
-    "explain": "SDDC Manager manages credentials and certificates."
-  },
-
-  {
-    "type": "single",
-    "q": "Which deployment model does VCF follow?",
-    "choices": [
-      "Application-centric",
-      "Infrastructure-centric",
-      "User-centric",
-      "Network-centric"
-    ],
-    "answer": [1],
-    "explain": "VCF focuses on infrastructure lifecycle automation."
-  },
-  {
-    "type": "multiple",
-    "q": "Which prerequisites are required before VCF bring-up?",
-    "choices": [
-      "DNS",
-      "NTP",
-      "DHCP",
-      "Active Directory"
-    ],
-    "answer": [0,1,2],
-    "explain": "DNS, NTP, and DHCP are mandatory prerequisites."
-  },
-  {
-    "type": "single",
-    "q": "Which API does SDDC Manager expose?",
-    "choices": [
-      "REST API",
-      "SOAP API",
-      "GraphQL",
-      "CLI only"
-    ],
-    "answer": [0],
-    "explain": "SDDC Manager provides REST APIs."
-  },
-  {
-    "type": "single",
-    "q": "What happens if bring-up validation fails?",
-    "choices": [
-      "VCF auto-fixes issues",
-      "Deployment continues",
-      "Deployment stops",
-      "Only logs are generated"
-    ],
-    "answer": [2],
-    "explain": "Bring-up stops if validation fails."
-  },
-  {
-    "type": "single",
-    "q": "Which role is required to deploy VCF?",
-    "choices": [
-      "vCenter Admin",
-      "NSX Admin",
-      "Cloud Administrator",
-      "SDDC Manager Admin"
-    ],
-    "answer": [3],
-    "explain": "SDDC Manager Admin is required for deployment."
-  },
-
-  {
-    "type": "single",
-    "q": "Which lifecycle operation upgrades ESXi hosts in VCF?",
-    "choices": [
-      "vCenter Lifecycle Manager",
-      "SDDC Manager",
-      "NSX Manager",
-      "Manual upgrade"
-    ],
-    "answer": [1],
-    "explain": "SDDC Manager orchestrates ESXi upgrades."
-  },
-  {
-    "type": "single",
-    "q": "Which VCF feature ensures version compatibility?",
-    "choices": [
-      "Bill of Materials (BOM)",
-      "Release Notes",
-      "Lifecycle Policies",
-      "Support Matrix"
-    ],
-    "answer": [0],
-    "explain": "BOM defines validated component versions."
-  },
-  {
-    "type": "multiple",
-    "q": "Which operations are Day-2 operations?",
-    "choices": [
-      "Scaling clusters",
-      "Patching",
-      "Initial bring-up",
-      "Adding workload domains"
-    ],
-    "answer": [0,1,3],
-    "explain": "Day-2 covers ongoing operations, not initial bring-up."
-  },
-  {
-    "type": "single",
-    "q": "Which component provides centralized logging in VCF?",
-    "choices": [
-      "vRealize Log Insight",
-      "vCenter",
-      "NSX",
-      "SDDC Manager"
-    ],
-    "answer": [0],
-    "explain": "Log Insight provides centralized logging."
-  },
-  {
-    "type": "single",
-    "q": "Which licensing model does VCF use?",
-    "choices": [
-      "Per-VM",
-      "Per-host CPU",
-      "Per-user",
-      "Per-application"
-    ],
-    "answer": [1],
-    "explain": "VCF licensing is per physical CPU."
-  },
-
-  {
-    "type": "single",
-    "q": "Which failure domain concept is used by vSAN?",
-    "choices": [
-      "Cluster only",
-      "Rack awareness",
-      "VM awareness",
-      "Application awareness"
-    ],
-    "answer": [1],
-    "explain": "vSAN supports rack-level fault domains."
-  },
-  {
-    "type": "single",
-    "q": "Which component handles north-south traffic in NSX?",
-    "choices": [
-      "Distributed Router",
-      "Tier-0 Gateway",
-      "Tier-1 Gateway",
-      "Logical Switch"
-    ],
-    "answer": [1],
-    "explain": "Tier-0 gateways handle north-south traffic."
-  },
-  {
-    "type": "single",
-    "q": "Which feature isolates tenants in VCF?",
-    "choices": [
-      "vSAN Policies",
-      "NSX Segments",
-      "vSphere HA",
-      "NTP Profiles"
-    ],
-    "answer": [1],
-    "explain": "NSX provides network isolation."
-  },
-  {
-    "type": "single",
-    "q": "Which VCF component manages host commissioning?",
-    "choices": [
-      "vCenter",
-      "NSX",
-      "SDDC Manager",
-      "vSAN"
-    ],
-    "answer": [2],
-    "explain": "SDDC Manager commissions hosts."
-  },
-  {
-    "type": "single",
-    "q": "Which VCF release artifact defines supported versions?",
-    "choices": [
-      "BOM",
-      "ISO",
-      "OVA",
-      "Patch Bundle"
-    ],
-    "answer": [0],
-    "explain": "The BOM defines supported versions."
-  }
-]
+{
+  "1": [4],
+  "2": [2,4,5],
+  "3": [4],
+  "4": [4],
+  "5": [1],
+  "6": [1],
+  "7": [1],
+  "8": [2],
+  "9": [1,3,5],
+  "10": [1],
+  "11": [1],
+  "12": [2],
+  "13": [3],
+  "14": [4],
+  "15": [2],
+  "16": [2],
+  "17": [3],
+  "18": [1],
+  "19": [3],
+  "20": [4],
+  "21": [2],
+  "22": [1,2],
+  "23": [4],
+  "24": [2],
+  "25": [4],
+  "26": [2],
+  "27": [1],
+  "28": [3],
+  "29": [2],
+  "30": [4],
+  "31": [3],
+  "32": [2],
+  "33": [4],
+  "34": [2,4],
+  "35": [4],
+  "36": [2],
+  "37": [4],
+  "38": [3],
+  "39": [2],
+  "40": [1,4],
+  "41": [2,5],
+  "42": [2],
+  "43": [2],
+  "44": [3],
+  "45": [1],
+  "46": [4],
+  "47": [2],
+  "48": [2],
+  "49": [3],
+  "50": [2],
+  "51": [1,4],
+  "52": [2],
+  "53": [3],
+  "54": [1],
+  "55": [4],
+  "56": [2],
+  "57": [1,2],
+  "58": [3],
+  "59": [2],
+  "60": [3,5]
+}
